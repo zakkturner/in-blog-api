@@ -50,11 +50,18 @@ class BlogPostController extends Controller
     }
 
 
+    public function edit($id): \Illuminate\Http\JsonResponse
+    {
+        $this->authorize('update', BlogPost::findOrFail($id));
+        $blogPost = BlogPost::with('user:id,name')->findOrFail($id);
+        return response()->json($blogPost);
+    }
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, BlogPost $post): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('update', $post);
         $request->validate([
             'title' => 'required|min:3',
             'body' => 'required|min:3'
@@ -71,6 +78,7 @@ class BlogPostController extends Controller
      */
     public function destroy($id): \Illuminate\Http\JsonResponse
     {
+        $this->authorize('delete', BlogPost::findOrFail($id) );
         $blogPost = BlogPost::findOrFail($id)->delete();
         return response()->json(['message' => 'Blog post deleted successfully'], 200);
     }

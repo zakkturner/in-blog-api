@@ -24,6 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
         return auth()->user()->posts;
     });
     Route::post('/post', [BlogPostController::class, 'store']);
+    Route::get('/postsAuth/{post}', [BlogPostController::class, 'edit']);
     Route::patch('/post/{post}', [BlogPostController::class, 'update']);
     Route::delete('/post/{post}', [BlogPostController::class, 'destroy']);
 });
