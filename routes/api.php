@@ -3,7 +3,7 @@
 use App\Http\Controllers\BlogPostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use \Laravel\Socialite\Facades\Socialite;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,14 +21,23 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::get('/user/posts', function(){
-        return auth()->user()->posts;
+        $posts = auth()->user()->posts;
+        $posts->map(function ($post) {
+            $post->user = $post->user()->select('id', 'name')->first();
+            $post->post_image = $post->post_image;
+            return $post;
+        });
+        return $posts;
     });
-    Route::post('/post', [BlogPostController::class, 'store']);
+
     Route::get('/postsAuth/{post}', [BlogPostController::class, 'edit']);
     Route::patch('/post/{post}', [BlogPostController::class, 'update']);
     Route::delete('/post/{post}', [BlogPostController::class, 'destroy']);
 });
-
+Route::post('/post', [BlogPostController::class, 'store']);
+Route::get('/auth/redirect', function(){
+    return Socialite::driver('github')->redirect();
+});
 Route::get('/posts', [BlogPostController::class, 'index']);
 Route::get('/posts/{post}', [BlogPostController::class, 'show']);
 

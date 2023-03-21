@@ -15,5 +15,9 @@ class BlogPost extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function post_image(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany('App\Models\PostImage');
+    }
 
 }

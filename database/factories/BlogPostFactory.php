@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\PostImage;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BlogPost>
@@ -22,6 +23,7 @@ class BlogPostFactory extends Factory
             'body' => $this->faker->sentences(12, true),
             'user_id' => User::factory(),
             'created_at' => $this->faker->dateTimeBetween('-30 days', now())
+
             //
         ];
     }

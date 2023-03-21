@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use App\Models\Project;
+
+use App\Models\PostImage;
+use App\Models\ProjectImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -16,7 +18,7 @@ class BlogPostController extends Controller
     public function index(): \Illuminate\Database\Eloquent\Collection
     {
         //
-        return BlogPost::with('user:id,name')->latest()->get();
+        return BlogPost::with('user:id,name', 'post_image')->latest()->get();
     }
 
 
@@ -29,14 +31,29 @@ class BlogPostController extends Controller
             'title' => 'required|min:3',
             'body' => 'required|min:3'
         ]);
+//        dd($request->file('image'));
+//        dd($request);
         $blogPost = BlogPost::create(
             [
                 'user_id' => auth()->id(),
+//                'user_id' => 1,
                 'title' => $request->title,
                 'body' => $request->body
+
             ]
         );
-        return response()->json([$blogPost]);
+
+
+        $image = $request->file('image');
+        if ($image) {
+            $imagePath = $image->store('images/' . $blogPost->id, 'public');
+            PostImage::create([
+                'post_image_caption' => $request->title,
+                'post_image_path' => $imagePath,
+                'blog_post_id' => $blogPost->id
+            ]);
+        }
+        return response()->json([$blogPost, $image ]);
     }
 
     /**
@@ -45,7 +62,7 @@ class BlogPostController extends Controller
     public function show($id): \Illuminate\Http\JsonResponse
     {
         //
-        $blogPost = BlogPost::with('user:id,name')->findOrFail($id);
+        $blogPost = BlogPost::with('user:id,name', 'post_image')->findOrFail($id);
         return response()->json($blogPost);
     }
 
